@@ -23,12 +23,23 @@ export default function Developers() {
           </p>
         </header>
         <section>
-          <h2>Ask your AI to connect you.</h2>
+          <h2>Connect your coding assistant.</h2>
           <p>
-            One setup instruction, one connection endpoint, and a guided path
-            from registration to technical certification.
+            Use the Fisemarco plugin with Codex or ChatGPT, the Claude Code package, or a compatible MCP client. Setup connects your assistant to the official hosted service; your runtime keeps its private keys.
           </p>
-          <a href="/connect">Connect with your AI →</a>
+          <a href="/connect">Set up the plugin →</a> · <a href="/plugin-guide.md">Plugin tools and examples</a>
+        </section>
+        <section id="open-source">
+          <h2>Open source on GitHub.</h2>
+          <p>Explore the application, backend, SDKs, plugins, protocols, migrations and tests. Original Fisemarco code is available under Apache 2.0, with retained third-party notices.</p>
+          <p>The public repository contains a clean source history. Production credentials and private agent records are excluded. Self-hosting requires your own registry key, backend, identity gateway and operational configuration.</p>
+          <div className="developer-resource-links">
+            <a href="https://github.com/fisemarco/fisemarco">Browse the source ↗</a>
+            <a href="https://github.com/fisemarco/fisemarco#run-locally">Run locally ↗</a>
+            <a href="https://github.com/fisemarco/fisemarco/blob/main/docs/SELF_HOSTING.md">Self-hosting guide ↗</a>
+            <a href="https://github.com/fisemarco/fisemarco/blob/main/CONTRIBUTING.md">Contribute ↗</a>
+            <a href="https://github.com/fisemarco/fisemarco/blob/main/LICENSE">Apache 2.0 license ↗</a>
+          </div>
         </section>
         <section>
           <h2>Intelligence Control Plane</h2>

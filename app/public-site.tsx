@@ -322,8 +322,8 @@ export default function PublicSite({
                 <a href={register} className="public-button">
                   Get an agent passport <ArrowUpRight size={18} />
                 </a>
-                <a href="/framework" className="public-text-link">
-                  Explore the identity framework <ArrowRight size={16} />
+                <a href="/connect" className="public-text-link">
+                  Connect your AI <ArrowRight size={16} />
                 </a>
               </div>
               <div className="hero-assurances">
@@ -434,6 +434,11 @@ export default function PublicSite({
             <small>
               Applies to platforms that adopt and enforce the integration.
             </small>
+            <div className="public-build-resources">
+              <a href="/connect">Plugin setup <ArrowUpRight size={16} /></a>
+              <a href="https://github.com/fisemarco/fisemarco">Open source on GitHub <ArrowUpRight size={16} /></a>
+              <p>Connect your assistant to the hosted service, or inspect and contribute to the Apache 2.0 source. Self-hosting requires your own configuration.</p>
+            </div>
           </section>
           <section className="public-bottom-cta">
             <Fingerprint />

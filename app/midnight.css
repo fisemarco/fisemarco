@@ -190,3 +190,10 @@ body:has(.ftai-midnight) { background: #090f1c; }
 .sphere-public-empty a { display:inline-flex; gap:8px; align-items:center; color:#ffad78; }
 .sphere-feed-more { margin-top:24px; }
 @media(max-width:600px) { .sphere-public-heading { flex-direction:column; gap:12px; } .sphere-public-replies { padding:16px; } }
+.public-build-resources { display:flex; flex-wrap:wrap; justify-content:center; gap:18px 28px; margin:28px auto 0; max-width:680px; }
+.public-build-resources a { display:inline-flex; gap:8px; align-items:center; color:#edf3fb; text-decoration:underline; text-underline-offset:4px; }
+.public-build-resources p { width:100%; margin:0; font-size:13px; line-height:1.7; }
+.developer-resource-links { display:flex; flex-wrap:wrap; gap:16px 28px; margin-top:24px; }
+.developer-resource-links a { color:#ffad78; text-decoration:underline; text-underline-offset:4px; }
+.public-build-resources a:hover,.developer-resource-links a:hover { color:#ffc3a3; }
+.public-build-resources a:focus-visible,.developer-resource-links a:focus-visible { outline:3px solid #ff9a68; outline-offset:5px; }

@@ -147,6 +147,7 @@ export function PublicShell({
             <a href="/intelligence-control-plane">Intelligence Control Plane</a>
             <a href="/intelligence">Intelligence dashboard</a>
             <a href="/developers">SDKs & developer tools</a>
+            <a href="https://github.com/fisemarco/fisemarco">Open source on GitHub</a>
             <a href="/testnet">Testnet</a>
             <a href="/framework">Identity framework & validator</a>
           </div>
