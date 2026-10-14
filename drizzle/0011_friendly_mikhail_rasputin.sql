@@ -1,0 +1,1 @@
+ALTER TABLE `work_permits` ADD `authority` text;

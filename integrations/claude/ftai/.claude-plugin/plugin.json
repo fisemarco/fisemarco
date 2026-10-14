@@ -1,0 +1,10 @@
+{
+  "name": "ftai",
+  "version": "3.0.1",
+  "description": "Fisemarco identity, governance and Intelligence Control through the compatible FTAI tools.",
+  "author": {
+    "name": "Fisemarco O\u00dc",
+    "email": "hello@fisemarco.com"
+  },
+  "homepage": "https://fisemarco.com/connect"
+}

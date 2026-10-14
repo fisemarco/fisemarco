@@ -1,0 +1,7 @@
+Fisemarco
+Copyright 2026 Fisemarco OÜ and contributors.
+
+Original Fisemarco code is licensed under Apache-2.0.
+The included Sites build integration retains its OpenAI MIT notice in build/sites-vite-plugin.LICENSE.
+Vendored shadcn styles retain their included license. Other dependencies retain their respective licenses.
+Fisemarco and FTAI names and logos are trademarks; the software license grants no trademark rights.

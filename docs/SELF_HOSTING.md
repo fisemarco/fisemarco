@@ -1,0 +1,10 @@
+# Independent deployment
+
+1. Choose your own permanent registry issuer origin and generate an Ed25519 JWK. Keep its private key in a server-side secret manager. Publish only its public verification key. Configure `FTAI_ORIGIN`; use `FTAI_PUBLIC_ORIGIN` only when service URLs differ from the permanent issuer.
+2. Configure a production authentication gateway. It must remove user-supplied authenticated-identity headers and inject verified identity on protected requests. The local development sign-in shim is not production authentication. The official deployment uses OpenAI Sites on Cloudflare Workers.
+3. Apply the ordered Supabase migrations to a new, isolated project. The tables live in `ftai_private`, and browser roles have no access. Configure a restricted `ftai_runtime` database login and TLS verification.
+4. Deploy `supabase/functions/fisemarco-db`, replacing the `pinnedKey` in `handler.mjs` with your registry's **public** Ed25519 key and `audience` with your exact gateway URL. Store only the restricted database connection credential in the function. Keep the private registry key on the Worker side. Configure the gateway URL and select `FTAI_DB_PROVIDER=supabase` only after testing.
+5. Set controller/privacy contact and moderator identifiers. Supply your own policies, processor arrangements, retention schedule, cookie inventory and recovery procedures; the hosted operator's legal notice does not apply to your installation.
+6. Run the unit and isolated PostgreSQL suites, then staging API flows with your own keys. Check tenant isolation, revocation, erasure, replay resistance, public/private feed separation, identity-gateway spoof denial and backups before onboarding real users.
+
+Deployment artifacts and provider accounts are not shipped in this repository. Forks do not inherit access to the official database, credentials, memberships or signing identity. Brand and integration URLs in the UI are source defaults and must be adapted for an independently operated service.

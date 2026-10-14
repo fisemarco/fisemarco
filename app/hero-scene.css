@@ -1,0 +1,184 @@
+.public-site.ftai-midnight .public-hero-3d {
+  position: relative;
+  isolation: isolate;
+  min-height: 760px;
+  display: flex;
+  background: #0d192b;
+  padding-top: 96px;
+  padding-bottom: 110px;
+}
+.public-hero-3d .hero-copy {
+  position: relative;
+  z-index: 2;
+  width: 48%;
+  pointer-events: none;
+}
+.public-hero-3d .hero-copy a {
+  pointer-events: auto;
+}
+.public-hero-3d .hero-copy h1 {
+  letter-spacing: -0.035em;
+}
+.hero-world {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+.hero-world-canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  right: 0;
+  top: 0;
+  mask-image: linear-gradient(90deg, transparent, #000 25%);
+}
+.hero-world-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hero-world-shade {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      #0d192b 0%,
+      #0d192bf5 24%,
+      #0d192b95 43%,
+      transparent 66%
+    ),
+    linear-gradient(0deg, #0d192b 0%, transparent 20%);
+}
+.hero-world-pause {
+  position: absolute;
+  right: 5%;
+  bottom: 28px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #526984;
+  border-radius: 6px;
+  background: #111e30;
+  color: #d7e7f1;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.hero-world-pause:hover {
+  background: #243b52;
+}
+.hero-world-pause:focus-visible {
+  outline: 3px solid #ff9a68;
+  outline-offset: 4px;
+}
+.hero-world-fallback {
+  position: absolute;
+  right: 15%;
+  top: 30%;
+  perspective: 800px;
+}
+.hero-world-monolith {
+  display: grid;
+  place-items: center;
+  width: 240px;
+  height: 280px;
+  border: 1px solid #a87350;
+  border-radius: 16px;
+  background: linear-gradient(#d77944 0 16px, #263b56 16px);
+  transform: rotateY(-25deg) rotateX(12deg);
+  box-shadow: 30px 50px 70px #03071190;
+}
+.hero-world-monolith span {
+  font-size: 120px;
+  color: #ffad78;
+}
+.hero-world[data-ready="true"] .hero-world-fallback {
+  display: none;
+}
+@media (max-width: 900px) {
+  .public-site.ftai-midnight .public-hero-3d {
+    min-height: 960px;
+    align-items: flex-start;
+    padding-top: 60px;
+    padding-bottom: 400px;
+  }
+  .public-hero-3d .hero-copy {
+    width: 100%;
+  }
+  .hero-world-canvas {
+    width: 115%;
+    height: 520px;
+    right: -8%;
+    top: auto;
+    bottom: -25px;
+    mask-image: linear-gradient(
+      180deg,
+      transparent,
+      #000 25%,
+      #000 90%,
+      transparent
+    );
+  }
+  .hero-world-shade {
+    background:
+      linear-gradient(
+        180deg,
+        #0d192b 0%,
+        #0d192b 38%,
+        #0d192b90 51%,
+        transparent 70%
+      ),
+      linear-gradient(0deg, #0d192b, transparent 20%);
+  }
+  .hero-world-fallback {
+    top: auto;
+    bottom: 100px;
+    right: 20%;
+  }
+  .hero-world-pause {
+    bottom: 15px;
+  }
+}
+@media (max-width: 500px) {
+  .public-site.ftai-midnight .public-hero-3d {
+    min-height: 930px;
+    padding-top: 42px;
+  }
+  .public-hero-3d .hero-copy h1 {
+    font-size: 52px;
+  }
+  .hero-world-canvas {
+    height: 450px;
+    width: 140%;
+    right: -20%;
+  }
+}
+.hero-world-flow {
+  position: absolute;
+  right: 5%;
+  bottom: 78px;
+  z-index: 3;
+  margin: 0;
+  color: #edf3fb;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: right;
+}
+.hero-world-flow small {
+  display: block;
+  color: #b0bfd2;
+  font-size: 10px;
+}
+@media (max-width: 900px) {
+  .hero-world-flow {
+    bottom: 64px;
+  }
+}

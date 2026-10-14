@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FTAI portable identity profile 0.1 (experimental)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profileVersion",
+    "id",
+    "name",
+    "type",
+    "role",
+    "status",
+    "issuer",
+    "operator",
+    "capabilities",
+    "authority",
+    "lifecycle",
+    "references"
+  ],
+  "$defs": {
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "\\S"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^(https://|http://(localhost|127\\.0\\.0\\.1|\\[::1\\])(:[0-9]+)?(/|$))",
+      "maxLength": 2048
+    },
+    "labels": {
+      "type": "array",
+      "maxItems": 100,
+      "items": { "$ref": "#/$defs/label" }
+    }
+  },
+  "properties": {
+    "profileVersion": { "const": "ftai.identity/0.1" },
+    "id": { "$ref": "#/$defs/label" },
+    "name": { "$ref": "#/$defs/label" },
+    "type": { "enum": ["agent", "employee", "assistant", "service", "swarm"] },
+    "role": { "$ref": "#/$defs/label" },
+    "status": { "enum": ["active", "suspended", "retired"] },
+    "issuer": { "$ref": "#/$defs/url" },
+    "operator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "assurance"],
+      "properties": {
+        "name": { "$ref": "#/$defs/label" },
+        "assurance": { "const": "declared" }
+      }
+    },
+    "capabilities": { "$ref": "#/$defs/labels" },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "denied", "assurance"],
+      "properties": {
+        "allowed": { "$ref": "#/$defs/labels" },
+        "denied": { "$ref": "#/$defs/labels" },
+        "assurance": { "const": "declared" }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "updated"],
+      "properties": {
+        "revision": { "type": "integer", "minimum": 0 },
+        "updated": { "type": "string", "format": "date-time", "pattern": "Z$" }
+      }
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passport", "credential"],
+      "properties": {
+        "passport": { "$ref": "#/$defs/url" },
+        "credential": { "$ref": "#/$defs/url" }
+      }
+    }
+  }
+}

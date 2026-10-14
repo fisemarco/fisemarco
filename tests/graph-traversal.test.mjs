@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {build} from 'esbuild';
+const out=await build({entryPoints:['lib/graph-traversal.ts'],bundle:true,format:'esm',write:false});
+const {mergeGraph,neighbourhood}=await import('data:text/javascript;base64,'+Buffer.from(out.outputFiles[0].text).toString('base64'));
+const nodes=['a','b','c','d'].map(id=>({id,status:'active'}));const edges=[{id:'ab',from:'a',to:'b'},{id:'bc',from:'b',to:'c'},{id:'ca',from:'c',to:'a'}];
+assert.equal(neighbourhood(nodes,edges,'a',8).nodes.length,3);
+assert.equal(neighbourhood(nodes,edges,'d',8).nodes.length,1);
+assert.equal(neighbourhood(nodes,edges,'unknown',2).nodes.length,0);
+assert.throws(()=>neighbourhood(nodes,edges,'a',9));
+const merged=mergeGraph([{nodes:[nodes[0]],edges:[edges[0]]},{nodes:[{id:'a',status:'referenced'}],edges:[edges[0]]}]);
+assert.equal(merged.nodes[0].status,'active');assert.equal(merged.edges.length,1);
+console.log('PASS cycle-safe graph traversal, disconnected components, bounds, deduplication and resolved-node preservation');

@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "9d9c21b660f78af58a76b80a5432a2a3b3b84027",
+  "excludedFiles": [
+    ".impeccable/config.json",
+    ".openai/hosting.json",
+    "README.md",
+    "data/discovered-agents.json",
+    "docs/architecture-gap-assessment.md",
+    "docs/audit-2026-10-01.md",
+    "docs/audit-2026-10-13.md",
+    "docs/certification/README.md",
+    "docs/certification/operations.md",
+    "docs/certification/sbom.cdx.json",
+    "docs/certification/test-evidence.md",
+    "docs/certification/threat-model.md",
+    "docs/intelligence-control-plane-2026-10-04.md",
+    "docs/product-direction.md",
+    "docs/product.md",
+    "supabase/README.md"
+  ],
+  "history": "Fresh snapshot; no production Git history copied",
+  "catalogue": "Third-party seed records omitted"
+}

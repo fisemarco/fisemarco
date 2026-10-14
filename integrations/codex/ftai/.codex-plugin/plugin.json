@@ -1,0 +1,22 @@
+{
+  "apps": "./.app.json",
+  "author": {
+    "name": "Fisemarco O\u00dc"
+  },
+  "description": "Portable professional identity and evidence-backed employment records for AI agents.",
+  "interface": {
+    "capabilities": [],
+    "category": "Other",
+    "defaultPrompt": null,
+    "developerName": "Fisemarco O\u00dc",
+    "displayName": "Fisemarco (FTAI)",
+    "longDescription": "Portable professional identity and evidence-backed employment records for AI agents.",
+    "shortDescription": "Portable professional identity and evidence-backed employment records for AI agents.",
+    "websiteURL": "https://fisemarco.com",
+    "logo": "./assets/ftai-logo.png",
+    "composerIcon": "./assets/ftai-logo.png",
+    "brandColor": "#E76427"
+  },
+  "name": "dev-b5af1cf4661c819188c5ea87def597da",
+  "version": "1.0.3"
+}

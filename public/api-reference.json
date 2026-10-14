@@ -1,0 +1,2178 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FTAI Passport API",
+    "version": "1.2.0",
+    "description": "Permanent AI identities, signed records, owner-listed public profile summaries, and authenticated runtime work gates. Full passports, QR destinations and record verification require authentication. The original identity is guarded against application-level modification; infrastructure administrators remain a trust boundary."
+  },
+  "servers": [
+    {
+      "url": "/api/v1"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "90-day workspace API key, scoped to its owning account. Does not grant enrollment policy administration."
+      },
+      "enrollmentKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Operator-issued fte_ enrollment key, used only for initial enrollment. X-FTAI-Signature proving control of submitted public key is also required."
+      },
+      "agentSignature": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-FTAI-Signature",
+        "description": "Ed25519 signature over the exact canonical request in /runtime-protocol.md. Also requires X-FTAI-Agent, X-FTAI-Timestamp, X-FTAI-Nonce."
+      },
+      "operatorSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "platform-managed-session",
+        "description": "Sign in with ChatGPT through the site. The platform validates the session and injects identity; callers must not supply identity headers. Browser writes require matching Origin."
+      }
+    },
+    "schemas": {
+      "PassportInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "role",
+          "organization",
+          "profile"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "organization": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "profile": {
+            "type": "object",
+            "properties": {
+              "creator": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "operator": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "model": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "version": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "externalDid": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "endpoint": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "skills": {
+                "type": "array",
+                "maxItems": 30,
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                }
+              },
+              "allowed": {
+                "type": "array",
+                "maxItems": 30,
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                }
+              },
+              "denied": {
+                "type": "array",
+                "maxItems": 30,
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "suspended",
+              "retired"
+            ],
+            "default": "active"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "private",
+              "shared"
+            ],
+            "default": "private",
+            "description": "private: owning account only. shared: summary listed publicly; complete passport requires authentication. Defaults to private."
+          },
+          "revision": {
+            "type": "integer",
+            "description": "Required for PATCH. Use the current server revision."
+          }
+        }
+      },
+      "RecordInput": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "employer",
+              "role",
+              "startDate"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "evidenceUrl": {
+                "type": "string",
+                "description": "HTTPS evidence URL, or empty."
+              },
+              "evidenceHash": {
+                "type": "string",
+                "pattern": "^$|^[a-fA-F0-9]{64}$"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "employment"
+                ]
+              },
+              "employer": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "role": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "startDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "compensation": {
+                "type": "string",
+                "maxLength": 200
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "employmentId",
+              "endDate"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "evidenceUrl": {
+                "type": "string",
+                "description": "HTTPS evidence URL, or empty."
+              },
+              "evidenceHash": {
+                "type": "string",
+                "pattern": "^$|^[a-fA-F0-9]{64}$"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "employment_end"
+                ]
+              },
+              "employmentId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "outcome",
+              "durationSeconds",
+              "intervention",
+              "version"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "evidenceUrl": {
+                "type": "string",
+                "description": "HTTPS evidence URL, or empty."
+              },
+              "evidenceHash": {
+                "type": "string",
+                "pattern": "^$|^[a-fA-F0-9]{64}$"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "task"
+                ]
+              },
+              "employmentId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "success",
+                  "failed",
+                  "partial"
+                ]
+              },
+              "durationSeconds": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 31536000
+              },
+              "intervention": {
+                "type": "boolean"
+              },
+              "version": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "suite",
+              "score",
+              "samples",
+              "version"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "evidenceUrl": {
+                "type": "string",
+                "description": "HTTPS evidence URL, or empty."
+              },
+              "evidenceHash": {
+                "type": "string",
+                "pattern": "^$|^[a-fA-F0-9]{64}$"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "benchmark"
+                ]
+              },
+              "suite": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "samples": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000000
+              },
+              "version": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "issuer",
+              "issued"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "evidenceUrl": {
+                "type": "string",
+                "description": "HTTPS evidence URL, or empty."
+              },
+              "evidenceHash": {
+                "type": "string",
+                "pattern": "^$|^[a-fA-F0-9]{64}$"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "credential"
+                ]
+              },
+              "issuer": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "credentialId": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "issued": {
+                "type": "string",
+                "format": "date"
+              },
+              "expires": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "severity",
+              "state",
+              "version"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "evidenceUrl": {
+                "type": "string",
+                "description": "HTTPS evidence URL, or empty."
+              },
+              "evidenceHash": {
+                "type": "string",
+                "pattern": "^$|^[a-fA-F0-9]{64}$"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "incident"
+                ]
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "critical"
+                ]
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "resolved"
+                ]
+              },
+              "version": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "version",
+              "model"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "evidenceUrl": {
+                "type": "string",
+                "description": "HTTPS evidence URL, or empty."
+              },
+              "evidenceHash": {
+                "type": "string",
+                "pattern": "^$|^[a-fA-F0-9]{64}$"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "version"
+                ]
+              },
+              "version": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "model": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "employer",
+              "rating",
+              "employmentId"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "evidenceUrl": {
+                "type": "string",
+                "description": "HTTPS evidence URL, or empty."
+              },
+              "evidenceHash": {
+                "type": "string",
+                "pattern": "^$|^[a-fA-F0-9]{64}$"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "review"
+                ]
+              },
+              "employer": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "rating": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "employmentId": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "targetId"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              "evidenceUrl": {
+                "type": "string",
+                "description": "HTTPS evidence URL, or empty."
+              },
+              "evidenceHash": {
+                "type": "string",
+                "pattern": "^$|^[a-fA-F0-9]{64}$"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "correction"
+                ]
+              },
+              "targetId": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "title",
+              "incidentId"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "incident_resolution"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "incidentId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "notes": {
+                "type": "string",
+                "maxLength": 4000
+              }
+            }
+          }
+        ]
+      },
+      "EnrollmentPolicy": {
+        "type": "object",
+        "required": [
+          "label",
+          "organization",
+          "allowed"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "organization": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "allowed": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 30,
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          "denied": {
+            "type": "array",
+            "maxItems": 30,
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          "maxAgents": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "default": 100
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused"
+            ],
+            "default": "active"
+          },
+          "revision": {
+            "type": "integer",
+            "description": "Required for PATCH"
+          }
+        }
+      },
+      "RuntimeEnrollment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "externalId",
+          "name",
+          "role",
+          "profile",
+          "publicKey"
+        ],
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "profile": {
+            "type": "object",
+            "properties": {
+              "creator": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "operator": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "model": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "version": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "externalDid": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "endpoint": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "skills": {
+                "type": "array",
+                "maxItems": 30,
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                }
+              },
+              "allowed": {
+                "type": "array",
+                "maxItems": 30,
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                }
+              },
+              "denied": {
+                "type": "array",
+                "maxItems": 30,
+                "items": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "publicKey": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kty",
+              "crv",
+              "x"
+            ],
+            "properties": {
+              "kty": {
+                "type": "string",
+                "enum": [
+                  "OKP"
+                ]
+              },
+              "crv": {
+                "type": "string",
+                "enum": [
+                  "Ed25519"
+                ]
+              },
+              "x": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{43}$"
+              }
+            }
+          }
+        }
+      },
+      "WorkRequest": {
+        "type": "object",
+        "required": [
+          "taskId",
+          "title",
+          "action"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "resource": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "inputHash": {
+            "type": "string",
+            "pattern": "^$|^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "RuntimeOutcome": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "taskId",
+          "outcome",
+          "durationSeconds"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "success",
+              "partial",
+              "failed"
+            ]
+          },
+          "durationSeconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 31536000
+          },
+          "intervention": {
+            "type": "boolean",
+            "default": false
+          },
+          "evidenceUrl": {
+            "type": "string",
+            "description": "HTTPS URL or empty"
+          },
+          "evidenceHash": {
+            "type": "string",
+            "pattern": "^$|^[a-f0-9]{64}$"
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/agents": {
+      "get": {
+        "summary": "List owned passports and records",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign-in required"
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create passport",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign-in required"
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PassportInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agents/{code}": {
+      "get": {
+        "summary": "Get accessible passport, records, and metrics",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required; public listing does not expose a complete passport without sign-in."
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Append identity update",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required; public listing does not expose a complete passport without sign-in."
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PassportInput"
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "code",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^FTAI-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}$"
+          }
+        }
+      ]
+    },
+    "/agents/{code}/records": {
+      "post": {
+        "summary": "Append an idempotent signed record",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required; public listing does not expose a complete passport without sign-in."
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordInput"
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "code",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^FTAI-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}$"
+          }
+        }
+      ]
+    },
+    "/agents/{code}/verify": {
+      "get": {
+        "summary": "Check full hash chain, signatures, and current lifecycle status",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required; public listing does not expose a complete passport without sign-in."
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "code",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^FTAI-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}$"
+          }
+        }
+      ]
+    },
+    "/agents/{code}/export": {
+      "get": {
+        "summary": "Export signed passport snapshot, valid for 24 hours",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required; public listing does not expose a complete passport without sign-in."
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "jwt"
+              ],
+              "default": "json"
+            }
+          }
+        ]
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "code",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^FTAI-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}$"
+          }
+        }
+      ]
+    },
+    "/agents/{code}/did.json": {
+      "get": {
+        "summary": "Resolve registry-managed agent DID",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required; public listing does not expose a complete passport without sign-in."
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "code",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^FTAI-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}$"
+          }
+        }
+      ]
+    },
+    "/issuer": {
+      "get": {
+        "summary": "Get registry issuer and public signing key",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign-in required"
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        }
+      }
+    },
+    "/verify": {
+      "post": {
+        "summary": "Verify VC-JWT, freshness, and record status",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required; public listing does not expose a complete passport without sign-in."
+          },
+          "403": {
+            "description": "Access denied"
+          },
+          "404": {
+            "description": "Missing or inaccessible passport"
+          },
+          "409": {
+            "description": "Revision, duplicate ID, or record conflict"
+          },
+          "503": {
+            "description": "Service temporarily unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "jws"
+                ],
+                "properties": {
+                  "jws": {
+                    "type": "string",
+                    "maxLength": 65536
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/enrollment-policies": {
+      "get": {
+        "summary": "List own policies, enrolled runtimes and latest 50 permits",
+        "security": [
+          {
+            "operatorSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create policy and reveal enrollment key once",
+        "security": [
+          {
+            "operatorSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentPolicy"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/enrollment-policies/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "patch": {
+        "summary": "Update policy using its current revision",
+        "security": [
+          {
+            "operatorSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentPolicy"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/enrollment-policies/{id}/rotate": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Rotate enrollment secret",
+        "security": [
+          {
+            "operatorSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/enrollment-policies/{id}/revoke-agent": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Revoke runtime signing key",
+        "security": [
+          {
+            "operatorSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "agent"
+                ],
+                "properties": {
+                  "agent": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/enrollment-policies/{id}/replace-key": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Replace signing key and preserve passport code",
+        "security": [
+          {
+            "operatorSession": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "agent",
+                  "publicKey"
+                ],
+                "properties": {
+                  "agent": {
+                    "type": "string"
+                  },
+                  "publicKey": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kty",
+                      "crv",
+                      "x"
+                    ],
+                    "properties": {
+                      "kty": {
+                        "type": "string",
+                        "enum": [
+                          "OKP"
+                        ]
+                      },
+                      "crv": {
+                        "type": "string",
+                        "enum": [
+                          "Ed25519"
+                        ]
+                      },
+                      "x": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{43}$"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime/enroll": {
+      "post": {
+        "summary": "Enroll using organization key and Ed25519 proof",
+        "security": [
+          {
+            "enrollmentKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "description": "See /runtime-protocol.md for required X-FTAI-Signature enrollment canonical message. New passports are always private.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuntimeEnrollment"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime/me": {
+      "get": {
+        "summary": "Read own runtime identity and current policy",
+        "security": [
+          {
+            "agentSignature": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        }
+      }
+    },
+    "/runtime/heartbeat": {
+      "post": {
+        "summary": "Report runtime status",
+        "security": [
+          {
+            "agentSignature": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "idle",
+                      "running",
+                      "degraded",
+                      "offline"
+                    ]
+                  },
+                  "details": {
+                    "type": "string",
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime/sync": {
+      "post": {
+        "summary": "Synchronize reported metadata; cannot change authority or owner",
+        "security": [
+          {
+            "agentSignature": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "role",
+                  "profile"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "role": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "profile": {
+                    "type": "object",
+                    "properties": {
+                      "creator": {
+                        "type": "string",
+                        "maxLength": 200
+                      },
+                      "operator": {
+                        "type": "string",
+                        "maxLength": 200
+                      },
+                      "model": {
+                        "type": "string",
+                        "maxLength": 200
+                      },
+                      "version": {
+                        "type": "string",
+                        "maxLength": 200
+                      },
+                      "externalDid": {
+                        "type": "string",
+                        "maxLength": 200
+                      },
+                      "endpoint": {
+                        "type": "string",
+                        "maxLength": 200
+                      },
+                      "description": {
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      "skills": {
+                        "type": "array",
+                        "maxItems": 30,
+                        "items": {
+                          "type": "string",
+                          "maxLength": 200,
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime/authorize": {
+      "post": {
+        "summary": "Issue a 60-second work permit",
+        "security": [
+          {
+            "agentSignature": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "description": "Execution must wait for a successful /start response. Action must match policy and passport and not be denied.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime/permits/{taskId}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "taskId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Read own permit state",
+        "security": [
+          {
+            "agentSignature": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        }
+      }
+    },
+    "/runtime/permits/{taskId}/start": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "taskId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Atomically consume a current permit before execution",
+        "security": [
+          {
+            "agentSignature": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime/outcomes": {
+      "post": {
+        "summary": "Record outcome for a consumed permit; exact retries are idempotent",
+        "security": [
+          {
+            "agentSignature": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuntimeOutcome"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/runtime/history": {
+      "post": {
+        "summary": "Import reported history outside live performance metrics",
+        "security": [
+          {
+            "agentSignature": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation succeeded"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication or signature required"
+          },
+          "403": {
+            "description": "Not authorized, paused or revoked"
+          },
+          "409": {
+            "description": "Conflict, replay, expired or consumed permit"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "importId",
+                  "record"
+                ],
+                "properties": {
+                  "importId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "record": {
+                    "type": "object",
+                    "description": "Original record input schema. Excludes correction, version, employment_end and incident_resolution."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/directory": {
+      "get": {
+        "summary": "Search public owner-listed profile summaries",
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "active",
+                "suspended",
+                "retired"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "At most 24 summaries: code, name, role, organization, status and up to four skills. No complete profiles or records. Includes total, offset and nextOffset."
+          },
+          "400": {
+            "description": "Invalid query"
+          }
+        }
+      }
+    },
+    "/agents/{code}/identity-lock": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "code",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Download the original lifetime identity seal",
+        "description": "Requires owner authentication for private passports, or an authenticated reader for listed passports. Returns permanent UUID, personnel code, issuance time, root fingerprint, original signed receipt and public key. Keep an independent trusted copy.",
+        "responses": {
+          "200": {
+            "description": "Verified identity seal"
+          },
+          "401": {
+            "description": "Authentication required; public listing does not expose a complete passport without sign-in."
+          },
+          "404": {
+            "description": "Not found or inaccessible"
+          },
+          "409": {
+            "description": "Original seal verification failed"
+          }
+        }
+      }
+    }
+  },
+  "standards": "/standards.md",
+  "cybersphere": "/cybersphere-protocol.md",
+  "discovery": {
+    "GET /api/v1/discoveries": "Public source summaries. q and offset; 24 per page. DISC references do not issue passports.",
+    "GET /api/v1/discoveries/{id}": "Public source details; hidden listings return 404."
+  },
+  "selfEnrollment": {
+    "challenge": "POST /api/v1/self-enrollment/challenge",
+    "register": "POST /api/v1/self-enrollment/register",
+    "protocol": "/cybersphere-protocol.md"
+  },
+  "governance": {
+    "privacy": "/privacy",
+    "safety": "/safety",
+    "standards": "/standards.md"
+  }
+}

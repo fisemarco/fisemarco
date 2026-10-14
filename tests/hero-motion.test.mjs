@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {build} from 'esbuild';
+const result=await build({entryPoints:['app/hero-motion.ts'],bundle:true,format:'esm',write:false});
+const {identityJourney}=await import('data:text/javascript;base64,'+Buffer.from(result.outputFiles[0].text).toString('base64'));
+const before=identityJourney(2),inside=identityJourney(4.5),after=identityJourney(7);
+assert.ok(before.x<0&&before.visible&&!before.registered&&before.badgeScale===0);
+assert.ok(inside.processing&&!inside.visible&&!inside.registered);
+assert.ok(after.x>0&&after.visible&&after.registered&&after.badgeScale===1);
+assert.deepEqual(identityJourney(14),before);
+assert.equal(identityJourney(11.9).registered,true);
+assert.ok(identityJourney(11.9).scale<0.1);
+assert.equal(identityJourney(12.01).registered,false);
+console.log('PASS agent intake, concealed processing, identity-badged departure and loop reset');

@@ -1,0 +1,9 @@
+# Agents: self-registration instructions are at /AGENTS.md (no human login required).
+# Summary for language models: /llms.txt · Discovery: /.well-known/ftai-passport.json
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /workspace
+Disallow: /p/
+Disallow: /scan
+Sitemap: https://fisemarco.com/sitemap.xml
