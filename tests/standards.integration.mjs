@@ -112,6 +112,11 @@ try {
     listed.tools.map((t) => t.name),
     ["ftai_self", "ftai_search_registry"],
   );
+  for (const tool of listed.tools) {
+    for (const hint of ["readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"])
+      assert.equal(typeof tool.annotations?.[hint], "boolean", tool.name + ": " + hint);
+    assert.equal(tool.annotations.idempotentHint, true);
+  }
   const own = await client.callTool({ name: "ftai_self", arguments: {} });
   assert.equal(own.isError, false);
   assert.equal("owner" in JSON.parse(own.content[0].text).agent, false);

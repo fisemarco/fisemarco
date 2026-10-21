@@ -98,6 +98,9 @@ try {
         "ftai_review_intelligence_capability",
       ].includes(t.name),
     );
+  for (const entry of list.tools)
+    for (const hint of ["readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"])
+      assert.equal(typeof entry.annotations?.[hint], "boolean", entry.name + ": " + hint);
   const setup = await tool("ftai_builder_setup");
   assert.equal(setup.privateByDefault, true);
   assert.ok(setup.nextStep);
