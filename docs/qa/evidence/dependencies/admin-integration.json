@@ -1,0 +1,137 @@
+{
+  "observedAt": "2026-10-21T13:16:45.581Z",
+  "passed": 27,
+  "failed": 0,
+  "cases": [
+    {
+      "scenario": "Browser database roles cannot access MFA or admin audit tables",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Owner pin is mandatory; legacy headers, foreign sessions and bearer keys cannot grant administration",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Owner must enroll MFA before reading data; cross-origin mutations fail closed",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "TOTP enrollment returns one-time recovery codes and rejects repeated or invalid codes",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Every administrative list loads from real PostgreSQL without leaking credential secrets",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Lifecycle change appends a valid record, conflicts stale revision, and rejects confirmation mismatch",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Restriction blocks actual account/API access and does not grant organisation owners platform access",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Real request submission enforces ownership, supports review version conflicts and complete history",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Privacy export needs an approved matching case and includes actual passport records",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Content draft, publish, withdrawal, immutable versions and stale-write rejection affect real public reads",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Saving a draft preserves an existing public article and concurrent decisions fail closed",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Recovery codes are single-use; admin unlock is bound to the account session and expires",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Administrative audit is append-only and actions are idempotent with matching request ID",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "TOTP matches an independent RFC 6238 SHA-1 test vector",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Private organisation detail, membership controls and API key revocation operate on real records",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Moderation resolves an actual report; previous moderator configuration cannot bypass owner MFA",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "A requester can supply missing information, while another tenant cannot update that request",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Restrictions block technical certification and invalidate previously issued certificate status",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Technical assessment, genuine certificate issuance and revocation",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Complete twelve-collection platform trust graph, chain inspection and live revocation",
+      "status": "PASS"
+    },
+    {
+      "scenario": "A real enrolled runtime loses authenticated access after restriction and key revocation",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Repeated terminal erasure returns the same reserved-identity receipt without another deletion",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Privacy erasure operates only after a matching approved case and leaves the reserved identity retired",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Concurrent terminal erasure requests converge on one original receipt",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Overview denial count reflects actual authority decision values",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Synthetic owner can reset MFA only with an existing factor and must enroll a new factor afterward",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    },
+    {
+      "scenario": "Admin audit signature can be verified independently from the stored record",
+      "status": "PASS",
+      "environment": "isolated PostgreSQL + real local Supabase Auth + actual HTTP handler"
+    }
+  ]
+}

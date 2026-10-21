@@ -1,0 +1,40 @@
+{
+  "before": {
+    "info": 0,
+    "low": 0,
+    "moderate": 1,
+    "high": 18,
+    "critical": 0,
+    "total": 19
+  },
+  "after": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "important": "Registry audit does not independently assess the local fork. Independent hostile-input and upstream-compatibility tests are required.",
+  "groups": {
+    "@cloudflare/vite-plugin": "Supported toolchain/transitive upgrade",
+    "@next/eslint-plugin-next": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "@shadcn/registry": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "@ts-morph/common": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "braces": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "eslint-config-next": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "fast-glob": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "hono": "Supported toolchain/transitive upgrade",
+    "micromatch": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "miniflare": "Supported toolchain/transitive upgrade",
+    "shadcn": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "sharp": "Supported toolchain/transitive upgrade",
+    "source-map-js": "Supported toolchain/transitive upgrade",
+    "ts-morph": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "vinext": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "vite": "Supported toolchain/transitive upgrade",
+    "vite-plugin-commonjs": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "vite-plugin-dynamic-import": "Patched recursion in the explicitly named local braces fork; all consumers resolve to it",
+    "wrangler": "Supported toolchain/transitive upgrade"
+  }
+}
