@@ -302,7 +302,7 @@ export default function PassportApp({ initialCode }: { initialCode?: string }) {
           required: ["query"],
           additionalProperties: false,
         },
-        annotations: { readOnlyHint: true, untrustedContentHint: true },
+        annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false, untrustedContentHint: true },
         execute: async (input: Record<string, unknown>) => {
           if (typeof input?.query !== "string" || input.query.length > 200)
             throw new Error("query must be a string of at most 200 characters");
@@ -328,7 +328,7 @@ export default function PassportApp({ initialCode }: { initialCode?: string }) {
           properties: {},
           additionalProperties: false,
         },
-        annotations: { readOnlyHint: false, untrustedContentHint: false },
+        annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false, untrustedContentHint: false },
         execute: async (input: Record<string, unknown>) => {
           if (!input || Object.keys(input).length)
             throw new Error("No arguments are accepted");

@@ -23,6 +23,7 @@ export const toolsList = [
     annotations: {
       readOnlyHint: true,
       destructiveHint: false,
+      idempotentHint: true,
       openWorldHint: false,
     },
   },
@@ -41,6 +42,7 @@ export const toolsList = [
     annotations: {
       readOnlyHint: true,
       destructiveHint: false,
+      idempotentHint: true,
       openWorldHint: false,
     },
   },
