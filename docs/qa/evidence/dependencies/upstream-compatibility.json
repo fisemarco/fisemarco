@@ -1,0 +1,14 @@
+{
+  "source": "micromatch/braces tag 3.0.3",
+  "stats": {
+    "suites": 49,
+    "tests": 764,
+    "passes": 764,
+    "pending": 0,
+    "failures": 0,
+    "start": "2026-10-21T13:16:20.536Z",
+    "end": "2026-10-21T13:16:20.600Z",
+    "duration": 64
+  },
+  "failures": []
+}

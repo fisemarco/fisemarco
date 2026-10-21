@@ -1,0 +1,53 @@
+{
+  "observedAt": "2026-10-21T13:18:31.939Z",
+  "environment": "Disposable local D1 registry + actual local Supabase GoTrue and Mailpit; Chrome",
+  "passed": 10,
+  "failed": 0,
+  "cases": [
+    {
+      "scenario": "Real local signup, SMTP verification, native browser login and synthetic passports",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Workspace → public registry → listed shared passport → workspace, without signing in again",
+      "status": "PASS"
+    },
+    {
+      "scenario": "All 34 public/account route headers retain authenticated Workspace navigation and approved logos",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Slow actual session read shows a checking state, never a false Sign in link",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Interrupted session read offers retry and recovers the same real native session",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Header retry updates the same session used by interactive public pages",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Interrupted passport list cannot turn a valid user into a signed-out user; shared passport still opens",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Passport session failure offers Retry opening page and restores access without new login",
+      "status": "PASS"
+    },
+    {
+      "scenario": "Foreign private passport stays inaccessible and logout restores the real login boundary",
+      "status": "PASS"
+    },
+    {
+      "scenario": "All served logo variants, compatibility SVG and packaged plugin artwork match the approved icon",
+      "status": "PASS"
+    }
+  ],
+  "limits": [
+    "Transport interruptions are deliberate Playwright fault injection; no fabricated authenticated response",
+    "No production writes or customer-record modifications",
+    "Hosted installed-plugin catalog presentation remains separately blocked by App-owned branding controls"
+  ]
+}

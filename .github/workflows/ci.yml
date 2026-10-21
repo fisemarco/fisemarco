@@ -16,5 +16,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - run: npm run audit:dependencies
       - run: npm run build
       - run: FTAI_PG_SUITES=registry,public-sphere node tests/postgres-app.integration.mjs

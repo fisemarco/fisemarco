@@ -33,3 +33,5 @@ A broader npm audit also reports pre-existing development-tool advisories beyond
 - https://github.com/modelcontextprotocol/typescript-sdk/security/advisories/GHSA-22jm-h49p-29qw
 - https://github.com/modelcontextprotocol/typescript-sdk/security/advisories/GHSA-6prh-2h8m-c8cw
 - https://modelcontextprotocol.io/specification/2025-11-25/schema#toolannotations
+
+The development-tool findings recorded above are historical. See [Dependency hardening](DEPENDENCY_HARDENING.md) for the subsequent complete remediation and test evidence.
