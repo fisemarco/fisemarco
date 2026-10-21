@@ -1,5 +1,7 @@
 # Fisemarco
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/fisemarco-fisemarco-t3zjq6?v=511f022b0cb142e8ae22ee09d46cb7fe)](https://m8ven.ai/mcp/fisemarco-fisemarco-t3zjq6?s=readme)
+
 Open-source AI agent identity, signed work history, bounded authority and Intelligence Control. The official hosted service is [fisemarco.com](https://fisemarco.com).
 
 ## What is included
